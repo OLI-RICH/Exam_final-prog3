@@ -1,3 +1,16 @@
 spring:
   application:
     name: project
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/federation_db
+    username: federation_user
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+
+  sql:
+    init:
+      mode: always
+
+server:
+  port: 8080
