@@ -1,0 +1,614 @@
+openapi: 3.0.0
+info:
+  title: API Fédération de collectivités agricoles
+  description: API pour la gestion des collectivités agricoles, des membres, des cotisations, des comptes, des activités, de l'assiduité et des statistiques
+  version: 2.0.0
+servers:
+  - url: https://api.federation-agricole.mg/v1
+
+paths:
+  /collectivites:
+    post:
+      summary: Ouverture d'une nouvelle collectivité
+      operationId: ouvrirCollectivite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nom
+                - ville
+                - specialite
+                - autorisationFederation
+                - membres
+              properties:
+                nom:
+                  type: string
+                ville:
+                  type: string
+                specialite:
+                  type: string
+                autorisationFederation:
+                  type: string
+                membres:
+                  type: array
+                  minItems: 10
+                  items:
+                    type: object
+                    properties:
+                      membreId:
+                        type: string
+                      poste:
+                        type: string
+                        enum:
+                          - president
+                          - president_adjoint
+                          - tresorier
+                          - secretaire
+                          - membre_confirme
+                          - membre_junior
+      responses:
+        '201':
+          description: Collectivité créée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  dateCreation:
+                    type: string
+                    format: date
+        '400':
+          description: Conditions non remplies
+          content:
+            text/plain:
+              schema:
+                type: string
+        '403':
+          description: Autorisation fédération invalide
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /collectivites/{collectiviteId}/membres:
+    post:
+      summary: Admission d'un nouveau membre (version mise à jour B-2)
+      operationId: admettreMembre
+      parameters:
+        - name: collectiviteId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - parrains
+                - nom
+                - prenom
+                - dateNaissance
+                - genre
+                - adresse
+                - metier
+                - telephone
+                - email
+                - modePaiementAdhesion
+                - modePaiementCotisationAnnuelle
+              properties:
+                parrains:
+                  type: array
+                  minItems: 2
+                  items:
+                    type: object
+                    required:
+                      - membreId
+                      - collectiviteId
+                      - relation
+                    properties:
+                      membreId:
+                        type: string
+                      collectiviteId:
+                        type: string
+                      relation:
+                        type: string
+                        enum:
+                          - famille
+                          - ami
+                          - collegue
+                          - autre
+                nom:
+                  type: string
+                prenom:
+                  type: string
+                dateNaissance:
+                  type: string
+                  format: date
+                genre:
+                  type: string
+                  enum:
+                    - feminin
+                    - masculin
+                adresse:
+                  type: string
+                metier:
+                  type: string
+                telephone:
+                  type: string
+                email:
+                  type: string
+                modePaiementAdhesion:
+                  type: string
+                  enum:
+                    - mobile_money
+                    - virement_bancaire
+                modePaiementCotisationAnnuelle:
+                  type: string
+                  enum:
+                    - mobile_money
+                    - virement_bancaire
+                    - especes
+      responses:
+        '201':
+          description: Membre admis
+        '400':
+          description: Conditions non remplies (parrainage insuffisant, paiement manquant)
+          content:
+            text/plain:
+              schema:
+                type: string
+        '403':
+          description: Refusé - nombre de parrains de la collectivité inférieur aux autres
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /membres/{membreId}/changer-collectivite:
+    patch:
+      summary: Changer de collectivité
+      operationId: changerCollectivite
+      parameters:
+        - name: membreId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nouvelleCollectiviteId:
+                  type: string
+      responses:
+        '200':
+          description: Collectivité changée
+        '404':
+          description: Membre non trouvé
+
+  /membres/{membreId}/demissionner:
+    post:
+      summary: Démissionner d'une collectivité
+      operationId: demissionner
+      parameters:
+        - name: membreId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Démission prise en compte
+        '404':
+          description: Membre non trouvé
+
+  /collectivites/{collectiviteId}/cotisations:
+    post:
+      summary: Encaisser une cotisation
+      operationId: encaisserCotisation
+      parameters:
+        - name: collectiviteId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - membreId
+                - montant
+                - date
+                - modePaiement
+                - typeCotisation
+              properties:
+                membreId:
+                  type: string
+                montant:
+                  type: number
+                date:
+                  type: string
+                  format: date
+                modePaiement:
+                  type: string
+                  enum:
+                    - especes
+                    - virement_bancaire
+                    - mobile_money
+                typeCotisation:
+                  type: string
+                  enum:
+                    - mensuelle
+                    - annuelle
+                    - ponctuelle
+      responses:
+        '201':
+          description: Encaissement enregistré
+        '404':
+          description: Collectivité ou membre non trouvé
+
+  /collectivites/{collectiviteId}/comptes:
+    get:
+      summary: Lister les comptes d'une collectivité
+      operationId: listerComptes
+      parameters:
+        - name: collectiviteId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Liste des comptes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '404':
+          description: Collectivité non trouvée
+    post:
+      summary: Ajouter un compte
+      operationId: ajouterCompte
+      parameters:
+        - name: collectiviteId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - caisse
+                - type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - bancaire
+                    titulaire:
+                      type: string
+                    banque:
+                      type: string
+                      enum:
+                        - BRED
+                        - MCB
+                        - BMOI
+                        - BOA
+                        - BGFI
+                        - AFG
+                        - ACCÈS BANQUE
+                        - BAOBAB
+                        - SIPEM
+                    numeroCompte:
+                      type: string
+                      pattern: '^\d{23}$'
+                - type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - mobile_money
+                    titulaire:
+                      type: string
+                    service:
+                      type: string
+                      enum:
+                        - Orange Money
+                        - Mvola
+                        - Airtel Money
+                    telephone:
+                      type: string
+      responses:
+        '201':
+          description: Compte créé
+        '400':
+          description: Données invalides
+        '404':
+          description: Collectivité non trouvée
+
+  /comptes/{compteId}/solde:
+    get:
+      summary: Consulter le solde d'un compte
+      operationId: consulterSolde
+      parameters:
+        - name: compteId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Solde du compte
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  solde:
+                    type: number
+                  devise:
+                    type: string
+                    default: MGA
+        '404':
+          description: Compte non trouvé
+
+  /collectivites/{collectiviteId}/activites:
+    get:
+      summary: Lister les activités d'une collectivité
+      operationId: listerActivites
+      parameters:
+        - name: collectiviteId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Liste des activités
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '404':
+          description: Collectivité non trouvée
+    post:
+      summary: Créer une activité exceptionnelle
+      operationId: creerActiviteExceptionnelle
+      parameters:
+        - name: collectiviteId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                date:
+                  type: string
+                  format: date
+                obligatoirePour:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - tous
+                      - juniors
+                      - confirmes
+                      - president
+      responses:
+        '201':
+          description: Activité créée
+        '404':
+          description: Collectivité non trouvée
+
+  /federation/activites:
+    get:
+      summary: Lister les activités planifiées par la fédération
+      operationId: listerActivitesFederation
+      responses:
+        '200':
+          description: Liste des activités fédérales
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /activites/{activiteId}/presences:
+    post:
+      summary: Enregistrer la présence d'un membre
+      operationId: enregistrerPresence
+      parameters:
+        - name: activiteId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                membreId:
+                  type: string
+                present:
+                  type: boolean
+                excuse:
+                  type: boolean
+                motif:
+                  type: string
+      responses:
+        '201':
+          description: Présence enregistrée
+        '400':
+          description: Données invalides
+        '404':
+          description: Activité ou membre non trouvé
+
+  /collectivites/{collectiviteId}/statistiques/mensuelles:
+    post:
+      summary: Envoyer le rapport mensuel à la fédération
+      operationId: rapportMensuel
+      parameters:
+        - name: collectiviteId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                annee:
+                  type: integer
+                mois:
+                  type: integer
+                tauxAssiduiteGlobal:
+                  type: number
+                nombreMembresActifs:
+                  type: integer
+      responses:
+        '201':
+          description: Rapport enregistré
+        '404':
+          description: Collectivité non trouvée
+
+  /collectivites/{collectiviteId}/membres/{membreId}/statistiques:
+    get:
+      summary: Statistiques détaillées d'un membre actif
+      operationId: statistiquesMembre
+      parameters:
+        - name: collectiviteId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: membreId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: debut
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: fin
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Statistiques du membre
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tauxAssiduite:
+                    type: number
+                  montantEncaisse:
+                    type: number
+                  montantImpaye:
+                    type: number
+        '404':
+          description: Collectivité ou membre non trouvé
+
+  /federation/statistiques/mensuelles:
+    get:
+      summary: Statistiques globales de la fédération (section H)
+      operationId: statistiquesFederation
+      parameters:
+        - name: debut
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: fin
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Rapport statistique de la fédération
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  periode:
+                    type: object
+                    properties:
+                      debut:
+                        type: string
+                        format: date
+                      fin:
+                        type: string
+                        format: date
+                  collectivites:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        collectiviteId:
+                          type: string
+                        nom:
+                          type: string
+                        tauxAssiduiteGlobal:
+                          type: number
+                        pourcentageMembresAJour:
+                          type: number
+                        nombreNouveauxAdherents:
+                          type: integer
+        '404':
+          description: Aucune donnée disponible
