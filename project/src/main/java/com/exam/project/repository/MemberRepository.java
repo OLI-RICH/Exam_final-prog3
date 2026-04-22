@@ -24,4 +24,23 @@ public class MemberRepository {
             return rs.next() ? rs.getLong(1) : 0;
         }
     }
+
+    public void updateCollectivityIdentity(String id, String number, String name) throws SQLException {
+        String sql = "UPDATE collectivity SET identification_number = ?, unique_name = ? WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, number);
+            pstmt.setString(2, name);
+            pstmt.setString(3, id);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public boolean isIdentityAlreadySet(String id) throws SQLException {
+        String sql = "SELECT identification_number FROM collectivity WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next() && rs.getString("identification_number") != null;
+        }
+    }
 }

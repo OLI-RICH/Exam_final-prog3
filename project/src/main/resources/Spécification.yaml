@@ -1,0 +1,149 @@
+openapi: 3.1.0
+info:
+  title: Agricultural federation API
+  description: |
+    - v0.0.1 (2026-04-21) : POST /collectivities and POST /members.
+    - v0.1.0 (2026-04-22) : PATCH /collectivities/{id}/identity (Feature J).
+  version: 0.1.0
+servers:
+  - url: 'http://localhost:8080/api'
+paths:
+  '/collectivities':
+    post:
+      summary: Create list of collectivities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateCollectivity'
+      responses:
+        '201':
+          description: List of created collectivities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Collectivity'
+
+  '/collectivities/{id}/identity':
+    patch:
+      summary: Assign unique name and number to a collectivity (Feature J)
+      description: |
+        Operation to assign a unique identification number and name. 
+        Once set, these values cannot be modified.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignIdentity'
+      responses:
+        '200':
+          description: Identity assigned successfully. Returns the updated collectivity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collectivity'
+        '400':
+          description: Unique name already exists.
+        '404':
+          description: Collectivity not found.
+        '409':
+          description: Conflict - Identity already assigned and cannot be changed.
+
+  '/members':
+    post:
+      summary: Create list of members
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateMember'
+      responses:
+        '201':
+          description: List of created members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Member'
+
+components:
+  schemas:
+    AssignIdentity:
+      type: object
+      required:
+        - identificationNumber
+        - uniqueName
+      properties:
+        identificationNumber:
+          type: string
+        uniqueName:
+          type: string
+
+    CreateCollectivity:
+      type: object
+      properties:
+        location:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/MemberIdentifier'
+        federationApproval:
+          type: boolean
+
+    Collectivity:
+      type: object
+      properties:
+        id:
+          type: string
+        identificationNumber:
+          type: string
+        uniqueName:
+          type: string
+        location:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/Member'
+
+    MemberIdentifier:
+      type: string
+
+    CreateMember:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        collectivityIdentifier:
+          type: string
+        registrationFeePaid:
+          type: boolean
+        membershipDuesPaid:
+          type: boolean
+
+    Member:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/MemberIdentifier'
+        firstName:
+          type: string
+        lastName:
+          type: string
