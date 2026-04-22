@@ -1,5 +1,5 @@
 
-CREATE USER federation_user WITH PASSWORD 'votre_mot_de_passe';
+CREATE USER federation_user WITH PASSWORD '1234';
 
 CREATE DATABASE federation_db OWNER federation_user;
 
