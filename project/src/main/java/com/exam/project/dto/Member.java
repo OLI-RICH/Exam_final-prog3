@@ -1,0 +1,15 @@
+package com.exam.project.dto;
+
+import java.util.List;
+
+public class Member extends MemberInformation {
+    private String id;
+    private List<Member> referees;
+
+    // Getters and setters
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+
+    public List<Member> getReferees() { return referees; }
+    public void setReferees(List<Member> referees) { this.referees = referees; }
+}

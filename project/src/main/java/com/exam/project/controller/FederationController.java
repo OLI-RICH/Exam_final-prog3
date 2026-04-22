@@ -1,10 +1,14 @@
 package com.exam.project.controller;
 
+import com.exam.project.dto.CreateCollectivity;
+import com.exam.project.dto.CreateMember;
 import com.exam.project.service.FederationService;
+import com.exam.project.model.Gender;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -17,46 +21,41 @@ public class FederationController {
     }
 
     @PostMapping("/collectivities")
-    public ResponseEntity<String> open(@RequestBody(required = false) Map<String, Object> body) {
-        if (body == null || body.isEmpty()) {
-            body = Map.of(
-                    "id", "COLL-DEFAULT-01",
-                    "name", "Collectivité Test Automatique",
-                    "federationApproval", true,
-                    "members", List.of(
-                            "M-SENIOR-1", "M-SENIOR-2", "M-SENIOR-3", "M-SENIOR-4", "M-SENIOR-5",
-                            "M-JUNIOR-1", "M-JUNIOR-2", "M-JUNIOR-3", "M-JUNIOR-4", "M-JUNIOR-5"
-                    )
-            );
+    public ResponseEntity<String> open(@RequestBody(required = false) CreateCollectivity payload) {
+        if (payload == null || payload.getMembers() == null) {
+            payload = new CreateCollectivity();
+            payload.setName("Collectivité Test");
+            payload.setFederationApproval(true);
+            payload.setMembers(List.of("M-S1", "M-S2", "M-S3", "M-S4", "M-S5", "M-1", "M-2", "M-3", "M-4", "M-5"));
         }
-
         try {
-            if (federationService.validateCollectivityA(body)) {
-                return ResponseEntity.status(201).body("Opening accepted (Default data used or received).");
+            if (federationService.validateCollectivityA(payload)) {
+                return ResponseEntity.status(201).body("Rule A: Validated (Table member)");
             }
-            return ResponseEntity.status(400).body("Rejected: Rule A criteria not met (Check seniors in database).");
+            return ResponseEntity.status(400).body("Rule A: Failure.");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Erreur : " + e.getMessage());
         }
     }
 
     @PostMapping("/members")
-    public ResponseEntity<String> join(@RequestBody(required = false) Map<String, Object> body) {
-        if (body == null || body.isEmpty()) {
-            body = Map.of(
-                    "name", "Nouveau Membre Auto",
-                    "godparents", List.of("M-SENIOR-1", "M-SENIOR-2"),
-                    "payment", 50000
-            );
+    public ResponseEntity<String> join(@RequestBody(required = false) CreateMember payload) {
+        if (payload == null || payload.getReferees() == null) {
+            payload = new CreateMember();
+            payload.setFirstName("Bryan");
+            payload.setLastName("Student");
+            payload.setBirthDate(LocalDate.of(2000, 1, 1));
+            payload.setGender(Gender.MALE);
+            payload.setRegistrationFeePaid(true);
+            payload.setReferees(List.of("M-S1", "M-S2"));
         }
-
         try {
-            if (federationService.validateNewMemberB2(body)) {
-                return ResponseEntity.status(201).body("Membership validated (Default data used or received).");
+            if (federationService.validateNewMemberB2(payload)) {
+                return ResponseEntity.status(201).body("Rule B-2: Validated (Table member)");
             }
-            return ResponseEntity.status(400).body("Rejected: Invalid referral or payment.");
+            return ResponseEntity.status(400).body("Rule B-2: Failure.");
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Erreur : " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Error : " + e.getMessage());
         }
     }
 }

@@ -1,10 +1,10 @@
 package com.exam.project.service;
 
+import com.exam.project.dto.CreateCollectivity;
+import com.exam.project.dto.CreateMember;
 import com.exam.project.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class FederationService {
@@ -14,23 +14,17 @@ public class FederationService {
         this.memberRepository = memberRepository;
     }
 
-    public boolean validateCollectivityA(Map<String, Object> data) throws SQLException {
-        Boolean approved = (Boolean) data.get("federationApproval");
-        List<String> members = (List<String>) data.get("members");
-        return Boolean.TRUE.equals(approved) && members != null &&
-                members.size() >= 10 && memberRepository.countSeniors(members) >= 5;
+    public boolean validateCollectivityA(CreateCollectivity dto) throws SQLException {
+        if (dto == null || dto.getMembers() == null) return false;
+        return dto.isFederationApproval() &&
+                dto.getMembers().size() >= 10 &&
+                memberRepository.countSeniors(dto.getMembers()) >= 5;
     }
 
-    public boolean validateNewMemberB2(Map<String, Object> data) throws SQLException {
-        List<String> godparents = (List<String>) data.get("godparents");
-        Object paymentObj = data.get("payment");
-
-        if (godparents == null || godparents.size() != 2 || paymentObj == null) {
-            return false;
-        }
-
-        double paymentValue = Double.parseDouble(paymentObj.toString());
-
-        return paymentValue >= 50000.0 && memberRepository.countSeniors(godparents) >= 2;
+    public boolean validateNewMemberB2(CreateMember dto) throws SQLException {
+        if (dto == null || dto.getReferees() == null) return false;
+        return dto.isRegistrationFeePaid() &&
+                dto.getReferees().size() >= 2 &&
+                memberRepository.countSeniors(dto.getReferees()) >= 2;
     }
 }
