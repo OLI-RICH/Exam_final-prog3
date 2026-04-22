@@ -11,11 +11,10 @@ public class MemberInformation {
     private Gender gender;
     private String address;
     private String profession;
-    private String phoneNumber; // Changed to String to match schema VARCHAR
+    private String phoneNumber; 
     private String email;
     private MemberOccupation occupation;
 
-    // Getters and setters
     public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
 

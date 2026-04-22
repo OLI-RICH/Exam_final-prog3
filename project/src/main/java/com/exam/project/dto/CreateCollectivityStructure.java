@@ -6,7 +6,6 @@ public class CreateCollectivityStructure {
     private String treasurer;
     private String secretary;
 
-    // Getters and setters
     public String getPresident() { return president; }
     public void setPresident(String president) { this.president = president; }
 

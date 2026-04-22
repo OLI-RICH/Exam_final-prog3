@@ -12,7 +12,6 @@ public class CreateContribution {
     private PaymentMethod paymentMethod;
     private String description;
 
-    // Getters and setters
     public String getMemberId() { return memberId; }
     public void setMemberId(String memberId) { this.memberId = memberId; }
 

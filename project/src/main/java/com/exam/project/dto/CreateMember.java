@@ -4,11 +4,10 @@ import java.util.List;
 
 public class CreateMember extends MemberInformation {
     private String collectivityIdentifier;
-    private List<String> referees; // MemberIdentifier is String
+    private List<String> referees;
     private boolean registrationFeePaid;
     private boolean membershipDuesPaid;
 
-    // Getters and setters
     public String getCollectivityIdentifier() { return collectivityIdentifier; }
     public void setCollectivityIdentifier(String collectivityIdentifier) { this.collectivityIdentifier = collectivityIdentifier; }
 

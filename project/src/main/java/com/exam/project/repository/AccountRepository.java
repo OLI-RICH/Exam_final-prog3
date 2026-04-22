@@ -26,7 +26,7 @@ public class AccountRepository {
             pstmt.setString(3, account.getOwnerId());
             pstmt.setBigDecimal(4, account.getBalance());
             pstmt.setString(5, account.getHolderName());
-            // Gestion des enums qui peuvent être nulls
+            
             pstmt.setString(6, account.getBankName() != null ? account.getBankName().name() : null);
             pstmt.setString(7, account.getAccountNumber());
             pstmt.setString(8, account.getMobileService() != null ? account.getMobileService().name() : null);

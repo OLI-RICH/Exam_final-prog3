@@ -6,7 +6,6 @@ public class CollectivityStructure {
     private Member treasurer;
     private Member secretary;
 
-    // Getters and setters
     public Member getPresident() { return president; }
     public void setPresident(Member president) { this.president = president; }
 

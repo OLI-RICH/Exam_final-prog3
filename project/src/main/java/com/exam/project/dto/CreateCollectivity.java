@@ -7,11 +7,11 @@ public class CreateCollectivity {
     private List<String> members;
     private boolean federationApproval;
     private CreateCollectivityStructure structure;
-    // Added to match schema
+    
     private String name;
     private String specialty;
 
-    // Getters and setters
+    
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
 

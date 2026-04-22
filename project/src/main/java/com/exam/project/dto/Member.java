@@ -6,7 +6,6 @@ public class Member extends MemberInformation {
     private String id;
     private List<Member> referees;
 
-    // Getters and setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 

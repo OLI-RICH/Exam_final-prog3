@@ -20,10 +20,10 @@ public class DatabaseConfig {
             System.out.println("✅ Database connection successful!");
             return conn;
         } catch (ClassNotFoundException e) {
-            System.err.println("❌ PostgreSQL Driver not found: " + e.getMessage());
+            System.err.println(" PostgreSQL Driver not found: " + e.getMessage());
             throw new SQLException("Driver PostgreSQL introuvable", e);
         } catch (SQLException e) {
-            System.err.println("❌ Database connection failed: " + e.getMessage());
+            System.err.println(" Database connection failed: " + e.getMessage());
             System.err.println("   URL: " + url);
             throw new SQLException("Connexion à la base de données échouée", e);
         }

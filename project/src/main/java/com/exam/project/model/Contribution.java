@@ -10,9 +10,9 @@ public class Contribution {
     private BigDecimal amount;
     private LocalDate date;
     private PaymentMethod paymentMethod;
-    private String description; // for periodic or specific event
+    private String description; 
 
-    // Getters and setters
+    
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 

@@ -18,7 +18,6 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-    // Cette méthode est celle que le Controller ne trouve pas
     public Optional<Account> getAccount(String id) throws SQLException {
         return accountRepository.findById(id);
     }

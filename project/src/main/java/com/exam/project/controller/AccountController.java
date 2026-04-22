@@ -39,7 +39,7 @@ public class AccountController {
             account.setOwnerId(request.getOwnerId());
             account.setBalance(request.getInitialBalance() != null ? request.getInitialBalance() : java.math.BigDecimal.ZERO);
 
-            // Mapping des nouveaux champs
+            
             account.setHolderName(request.getHolderName());
             account.setBankName(request.getBankName());
             account.setAccountNumber(request.getAccountNumber());

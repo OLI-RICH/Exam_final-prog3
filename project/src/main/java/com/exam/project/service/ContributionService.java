@@ -28,13 +28,13 @@ public class ContributionService {
             throw new IllegalArgumentException("Le montant de la cotisation doit être positif.");
         }
 
-        // 1. Sauvegarde de la transaction en base
+        
         contributionRepository.save(contribution);
 
-        // 2. Mise à jour du solde du compte de la collectivité
+        
         List<Account> accounts = accountService.getAccountsByOwner(contribution.getCollectivityId());
 
-        // On cherche le compte qui correspond au mode de paiement (CASH -> compte CASH, etc.)
+        
         Account targetAccount = accounts.stream()
                 .filter(acc -> acc.getType().name().equals(contribution.getPaymentMethod().name().replace("_TRANSFER", "")))
                 .findFirst()

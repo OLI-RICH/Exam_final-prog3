@@ -9,13 +9,13 @@ public class CreateAccount {
     private AccountType type;
     private String ownerId;
     private BigDecimal initialBalance;
-    private String holderName; // Ajouté
-    private BankName bankName; // Ajouté
-    private String accountNumber; // Ajouté
-    private MobileMoneyService mobileService; // Ajouté
-    private String phoneNumber; // Ajouté
+    private String holderName; 
+    private BankName bankName; 
+    private String accountNumber; 
+    private MobileMoneyService mobileService; 
+    private String phoneNumber; 
 
-    // Getters and setters
+    
     public AccountType getType() { return type; }
     public void setType(AccountType type) { this.type = type; }
 

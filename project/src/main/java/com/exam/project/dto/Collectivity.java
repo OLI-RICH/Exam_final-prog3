@@ -8,7 +8,6 @@ public class Collectivity {
     private CollectivityStructure structure;
     private List<Member> members;
 
-    // Getters and setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 

@@ -5,19 +5,19 @@ import java.math.BigDecimal;
 public class Account {
     private String id;
     private AccountType type;
-    private String ownerId; // collectivity id or "federation"
-    private BigDecimal balance; // in MGA
+    private String ownerId; 
+    private BigDecimal balance; 
 
-    // For bank accounts
+    
     private String holderName;
     private BankName bankName;
-    private String accountNumber; // 23 digits
+    private String accountNumber; 
 
-    // For mobile money
+    
     private MobileMoneyService mobileService;
     private String phoneNumber;
 
-    // Getters and setters
+    
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
