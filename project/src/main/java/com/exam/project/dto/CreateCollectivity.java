@@ -4,7 +4,7 @@ import java.util.List;
 
 public class CreateCollectivity {
     private String location;
-    private List<String> members; // MemberIdentifier
+    private List<String> members;
     private boolean federationApproval;
     private CreateCollectivityStructure structure;
     // Added to match schema

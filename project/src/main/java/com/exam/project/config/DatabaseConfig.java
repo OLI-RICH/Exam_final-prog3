@@ -16,9 +16,16 @@ public class DatabaseConfig {
         String pass = "1234";
         try {
             Class.forName("org.postgresql.Driver");
+            Connection conn = DriverManager.getConnection(url, user, pass);
+            System.out.println("✅ Database connection successful!");
+            return conn;
         } catch (ClassNotFoundException e) {
+            System.err.println("❌ PostgreSQL Driver not found: " + e.getMessage());
             throw new SQLException("Driver PostgreSQL introuvable", e);
+        } catch (SQLException e) {
+            System.err.println("❌ Database connection failed: " + e.getMessage());
+            System.err.println("   URL: " + url);
+            throw new SQLException("Connexion à la base de données échouée", e);
         }
-        return DriverManager.getConnection(url, user, pass);
     }
 }

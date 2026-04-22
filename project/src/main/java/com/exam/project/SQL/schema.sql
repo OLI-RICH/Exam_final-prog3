@@ -32,3 +32,25 @@ CREATE TABLE member_referees (
     relationship_type VARCHAR(50),
     PRIMARY KEY (member_id, referee_id)
 );
+
+CREATE TABLE account (
+    id VARCHAR(50) PRIMARY KEY,
+    type VARCHAR(20) CHECK (type IN ('CASH', 'BANK', 'MOBILE_MONEY')),
+    owner_id VARCHAR(50) NOT NULL, -- collectivity id or 'federation'
+    balance DECIMAL(15,2) DEFAULT 0.00,
+    holder_name VARCHAR(255),
+    bank_name VARCHAR(20) CHECK (bank_name IN ('BRED', 'MCB', 'BMOI', 'BOA', 'BGFI', 'AFG', 'ACCES_BANQUE', 'BAOBAB', 'SIPEM')),
+    account_number VARCHAR(23),
+    mobile_service VARCHAR(20) CHECK (mobile_service IN ('ORANGE_MONEY', 'MVOLA', 'AIRTEL_MONEY')),
+    phone_number VARCHAR(20)
+);
+
+CREATE TABLE contribution (
+    id VARCHAR(50) PRIMARY KEY,
+    member_id VARCHAR(50) REFERENCES member(id),
+    collectivity_id VARCHAR(50) REFERENCES collectivity(id),
+    amount DECIMAL(15,2) NOT NULL,
+    date DATE NOT NULL,
+    payment_method VARCHAR(20) CHECK (payment_method IN ('CASH', 'BANK_TRANSFER', 'MOBILE_MONEY')),
+    description TEXT
+);
