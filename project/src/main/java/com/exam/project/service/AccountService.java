@@ -24,12 +24,12 @@ public class AccountService {
 
     public void createAccount(Account account) throws SQLException {
         if (account.getType() == AccountType.CASH && accountRepository.hasCashAccount(account.getOwnerId())) {
-            throw new IllegalArgumentException("Une caisse existe déjà pour cette collectivité.");
+            throw new IllegalArgumentException("A fund already exists for this community.");
         }
 
         if (account.getType() == AccountType.BANK && account.getAccountNumber() != null) {
             if (account.getAccountNumber().length() != 23 || !account.getAccountNumber().matches("\\d{23}")) {
-                throw new IllegalArgumentException("Le RIB doit contenir exactement 23 chiffres.");
+                throw new IllegalArgumentException("The bank account details (RIB) must contain exactly 23 digits.");
             }
         }
         accountRepository.save(account);
@@ -41,7 +41,7 @@ public class AccountService {
 
     public void updateBalance(String accountId, BigDecimal newBalance) throws SQLException {
         if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Le solde ne peut pas être négatif.");
+            throw new IllegalArgumentException("The balance cannot be negative.");
         }
         accountRepository.updateBalance(accountId, newBalance);
     }

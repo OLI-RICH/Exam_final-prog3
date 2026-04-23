@@ -6,6 +6,7 @@ import com.exam.project.model.BankName;
 import com.exam.project.model.MobileMoneyService;
 import org.springframework.stereotype.Repository;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -96,5 +97,25 @@ public class AccountRepository {
         }
         account.setPhoneNumber(rs.getString("phone_number"));
         return account;
+    }
+
+    public List<Account> findAccountsByOwnerAtDate(String ownerId, LocalDate at) throws SQLException {
+        String sql = "SELECT a.*, " +
+                "(SELECT COALESCE(SUM(c.amount), 0) FROM contribution c " +
+                " WHERE c.collectivity_id = a.owner_id AND c.date <= ?) as dynamic_balance " +
+                "FROM account a WHERE a.owner_id = ?";
+
+        List<Account> accounts = new ArrayList<>();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setDate(1, java.sql.Date.valueOf(at));
+            pstmt.setString(2, ownerId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Account acc = mapToAccount(rs);
+                acc.setBalance(rs.getBigDecimal("dynamic_balance"));
+                accounts.add(acc);
+            }
+        }
+        return accounts;
     }
 }

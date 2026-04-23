@@ -5,8 +5,6 @@ import com.exam.project.model.Contribution;
 import com.exam.project.repository.ContributionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -24,28 +22,21 @@ public class ContributionService {
 
     @Transactional
     public void recordContribution(Contribution contribution) throws SQLException {
-        if (contribution.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Le montant de la cotisation doit être positif.");
+        if (contribution.getAmount().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("The amount must be positive");
         }
 
-        
         contributionRepository.save(contribution);
 
-        
         List<Account> accounts = accountService.getAccountsByOwner(contribution.getCollectivityId());
 
-        
         Account targetAccount = accounts.stream()
                 .filter(acc -> acc.getType().name().equals(contribution.getPaymentMethod().name().replace("_TRANSFER", "")))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Aucun compte de type " + contribution.getPaymentMethod() + " configuré pour cette collectivité."));
+                .orElseThrow(() -> new IllegalArgumentException("No account found for this payment method"));
 
-        BigDecimal newBalance = targetAccount.getBalance().add(contribution.getAmount());
+        java.math.BigDecimal newBalance = targetAccount.getBalance().add(contribution.getAmount());
         accountService.updateBalance(targetAccount.getId(), newBalance);
-    }
-
-    public Optional<Contribution> getContribution(String id) throws SQLException {
-        return contributionRepository.findById(id);
     }
 
     public List<Contribution> getContributionsByCollectivity(String collectivityId) throws SQLException {
@@ -54,5 +45,9 @@ public class ContributionService {
 
     public List<Contribution> getContributionsByMember(String memberId) throws SQLException {
         return contributionRepository.findByMemberId(memberId);
+    }
+
+    public Optional<Contribution> getContribution(String id) throws SQLException {
+        return contributionRepository.findById(id);
     }
 }

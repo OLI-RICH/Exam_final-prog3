@@ -1,7 +1,9 @@
 package com.exam.project.repository;
 
+import com.exam.project.dto.Collectivity;
 import org.springframework.stereotype.Repository;
 import java.sql.*;
+import java.util.Optional;
 
 @Repository
 public class CollectivityRepository {
@@ -37,5 +39,20 @@ public class CollectivityRepository {
             pstmt.setString(3, id);
             pstmt.executeUpdate();
         }
+    }
+
+    public Optional<Collectivity> findById(String id) throws SQLException {
+        String sql = "SELECT * FROM collectivity WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                Collectivity coll = new Collectivity();
+                coll.setId(rs.getString("id"));
+                coll.setLocation(rs.getString("location"));
+                return Optional.of(coll);
+            }
+        }
+        return Optional.empty();
     }
 }
