@@ -67,4 +67,22 @@ public class AccountService {
         }
         return accounts;
     }
+    public List<Account> getAllAccounts() throws SQLException {
+        List<Account> accounts = new ArrayList<>();
+        String sql = "SELECT * FROM account ORDER BY owner_id, type";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                accounts.add(Account.builder()
+                        .id(rs.getString("id"))
+                        .type(rs.getString("type"))
+                        .ownerId(rs.getString("owner_id"))
+                        .balance(rs.getBigDecimal("balance"))
+                        .holderName(rs.getString("holder_name"))
+                        .build());
+            }
+        }
+        return accounts;
+    }
 }

@@ -49,4 +49,13 @@ public class AccountController {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+    @GetMapping
+    public ResponseEntity<?> getAllAccounts() {
+        try {
+            List<Account> accounts = accountService.getAllAccounts();
+            return ResponseEntity.ok(accounts);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
 }
