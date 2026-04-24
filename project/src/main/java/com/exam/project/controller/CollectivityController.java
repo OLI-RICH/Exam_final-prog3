@@ -18,10 +18,20 @@ public class CollectivityController {
         this.service = service;
     }
 
+    @GetMapping
+    public ResponseEntity<?> getAllCollectivities() {
+        try {
+            List<Collectivity> collectivities = service.getAllCollectivities();
+            return ResponseEntity.ok(collectivities);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getCollectivity(@PathVariable String id) {
         try {
-            com.exam.project.model.Collectivity collectivity = service.getCollectivityById(id);
+            Collectivity collectivity = service.getCollectivityById(id);
             if (collectivity == null) {
                 return ResponseEntity.notFound().build();
             }
@@ -34,7 +44,7 @@ public class CollectivityController {
     @GetMapping("/{id}/members")
     public ResponseEntity<?> getCollectivityMembers(@PathVariable String id) {
         try {
-            List<com.exam.project.model.Member> members = service.getMembersByCollectivityId(id);
+            List<Member> members = service.getMembersByCollectivityId(id);
             return ResponseEntity.ok(members);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());

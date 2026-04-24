@@ -1,6 +1,7 @@
 package com.exam.project.model;
 import lombok.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class Collectivity {
@@ -10,4 +11,5 @@ public class Collectivity {
     private LocalDate creationDate;
     private String identificationNumber;
     private String uniqueName;
+    private List<Member> members;
 }

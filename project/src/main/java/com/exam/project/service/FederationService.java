@@ -44,10 +44,33 @@ public class FederationService {
                 if (creationDate != null) col.setCreationDate(creationDate.toLocalDate());
                 col.setIdentificationNumber(rs.getString("identification_number"));
                 col.setUniqueName(rs.getString("unique_name"));
+                col.setMembers(getMembersByCollectivityId(id));
                 return col;
             }
         }
         return null;
+    }
+
+    public List<Collectivity> getAllCollectivities() throws SQLException {
+        List<Collectivity> collectivities = new ArrayList<>();
+        String sql = "SELECT id, name, city, creation_date, identification_number, unique_name FROM collectivity ORDER BY id";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Collectivity col = new Collectivity();
+                col.setId(rs.getString("id"));
+                col.setName(rs.getString("name"));
+                col.setCity(rs.getString("city"));
+                Date creationDate = rs.getDate("creation_date");
+                if (creationDate != null) col.setCreationDate(creationDate.toLocalDate());
+                col.setIdentificationNumber(rs.getString("identification_number"));
+                col.setUniqueName(rs.getString("unique_name"));
+                col.setMembers(getMembersByCollectivityId(col.getId()));
+                collectivities.add(col);
+            }
+        }
+        return collectivities;
     }
 
     public void assignIdentity(String id, String number, String name) throws SQLException {
@@ -172,23 +195,18 @@ public class FederationService {
 
     public List<Account> getAccountsWithBalance(String collectivityId, LocalDate at) throws SQLException {
         List<Account> accounts = new ArrayList<>();
-
         BigDecimal totalContributions = getTotalContributions(collectivityId, at);
-
         String sqlAcc = "SELECT id, type, owner_id, balance, holder_name FROM account WHERE owner_id = ?";
-
         try (Connection conn = dataSource.getConnection();
              PreparedStatement psAcc = conn.prepareStatement(sqlAcc)) {
-
             psAcc.setString(1, collectivityId);
             ResultSet rs = psAcc.executeQuery();
-
             while (rs.next()) {
                 Account account = new Account();
                 account.setId(rs.getString("id"));
                 account.setType(rs.getString("type"));
                 account.setOwnerId(rs.getString("owner_id"));
-                account.setBalance(totalContributions);  // Le solde est le total des contributions
+                account.setBalance(totalContributions);
                 account.setHolderName(rs.getString("holder_name"));
                 accounts.add(account);
             }
@@ -198,7 +216,6 @@ public class FederationService {
 
     private BigDecimal getTotalContributions(String collectivityId, LocalDate at) throws SQLException {
         String sqlSum = "SELECT COALESCE(SUM(amount), 0) FROM contribution WHERE collectivity_id = ? AND date <= ?";
-
         try (Connection conn = dataSource.getConnection();
              PreparedStatement psSum = conn.prepareStatement(sqlSum)) {
             psSum.setString(1, collectivityId);
@@ -250,18 +267,14 @@ public class FederationService {
     public List<Contribution> getTransactionsByCollectivityId(String collectivityId, LocalDate start, LocalDate end) throws SQLException {
         List<Contribution> transactions = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT * FROM contribution WHERE collectivity_id = ? AND member_id IS NOT NULL AND member_id != ''");
-
         if (start != null) sql.append(" AND date >= ?");
         if (end != null) sql.append(" AND date <= ?");
-
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-
             int index = 1;
             ps.setString(index++, collectivityId);
             if (start != null) ps.setDate(index++, Date.valueOf(start));
             if (end != null) ps.setDate(index++, Date.valueOf(end));
-
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Contribution c = new Contribution();
