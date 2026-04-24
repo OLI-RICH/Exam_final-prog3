@@ -7,26 +7,56 @@ public class CreateCollectivity {
     private List<String> members;
     private boolean federationApproval;
     private CreateCollectivityStructure structure;
-    
+
     private String name;
     private String specialty;
 
-    
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
 
-    public List<String> getMembers() { return members; }
-    public void setMembers(List<String> members) { this.members = members; }
+    public String getLocation() {
+        return location;
+    }
 
-    public boolean isFederationApproval() { return federationApproval; }
-    public void setFederationApproval(boolean federationApproval) { this.federationApproval = federationApproval; }
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
-    public CreateCollectivityStructure getStructure() { return structure; }
-    public void setStructure(CreateCollectivityStructure structure) { this.structure = structure; }
+    public List<String> getMembers() {
+        return members;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setMembers(List<String> members) {
+        this.members = members;
+    }
 
-    public String getSpecialty() { return specialty; }
-    public void setSpecialty(String specialty) { this.specialty = specialty; }
+    public boolean isFederationApproval() {
+        return federationApproval;
+    }
+
+    public void setFederationApproval(boolean federationApproval) {
+        this.federationApproval = federationApproval;
+    }
+
+    public CreateCollectivityStructure getStructure() {
+        return structure;
+    }
+
+    public void setStructure(CreateCollectivityStructure structure) {
+        this.structure = structure;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSpecialty() {
+        return specialty;
+    }
+
+    public void setSpecialty(String specialty) {
+        this.specialty = specialty;
+    }
 }

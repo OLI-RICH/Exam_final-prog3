@@ -1,0 +1,473 @@
+{
+  "info": {
+    "_postman_id": "collectivity-api-tests",
+    "name": "Collectivity Management API",
+    "description": "Collection de tests pour tous les endpoints de gestion des collectivités",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Collectivités",
+      "item": [
+        {
+          "name": "1. Créer collectivités (POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function() {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has ID', function() {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.id).to.exist;",
+                  "  pm.collectionVariables.set('collectivity_id', jsonData.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"name\": \"Collectivité Alpha\",\n    \"description\": \"Collectivité test 1\",\n    \"region\": \"Région A\"\n  },\n  {\n    \"name\": \"Collectivité Beta\",\n    \"description\": \"Collectivité test 2\",\n    \"region\": \"Région B\"\n  },\n  {\n    \"name\": \"Collectivité Gamma\",\n    \"description\": \"Collectivité test 3\",\n    \"region\": \"Région C\"\n  }\n]"
+            },
+            "url": {
+              "raw": "{{base_url}}/collectivities",
+              "host": ["{{base_url}}"],
+              "path": ["collectivities"]
+            }
+          }
+        },
+        {
+          "name": "2. GET Collectivité par ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contient ID et name', function() {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.id).to.exist;",
+                  "  pm.expect(jsonData.name).to.exist;",
+                  "});",
+                  "",
+                  "pm.test('Response contient tableau members', function() {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.members).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/collectivities/{{collectivity_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["collectivities", "{{collectivity_id}}"]
+            }
+          }
+        },
+        {
+          "name": "3. PUT Attribuer informations uniques",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"number\": \"COL-2024-001\",\n  \"name\": \"Collectivité Officielle Alpha\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/collectivities/{{collectivity_id}}/informations",
+              "host": ["{{base_url}}"],
+              "path": ["collectivities", "{{collectivity_id}}", "informations"]
+            }
+          }
+        },
+        {
+          "name": "4. POST Créer cotisations",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function() {",
+                  "  pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"amount\": 5000,\n    \"frequency\": \"MONTHLY\",\n    \"startDate\": \"2024-04-01\",\n    \"description\": \"Cotisation mensuelle\"\n  },\n  {\n    \"amount\": 50000,\n    \"frequency\": \"ANNUAL\",\n    \"startDate\": \"2024-01-01\",\n    \"description\": \"Cotisation annuelle\"\n  }\n]"
+            },
+            "url": {
+              "raw": "{{base_url}}/collectivities/{{collectivity_id}}/membershipFees",
+              "host": ["{{base_url}}"],
+              "path": ["collectivities", "{{collectivity_id}}", "membershipFees"]
+            }
+          }
+        },
+        {
+          "name": "5. GET Récupérer cotisations",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response est un tableau', function() {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/collectivities/{{collectivity_id}}/membershipFees",
+              "host": ["{{base_url}}"],
+              "path": ["collectivities", "{{collectivity_id}}", "membershipFees"]
+            }
+          }
+        },
+        {
+          "name": "6. GET Transactions (avec période)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/collectivities/{{collectivity_id}}/transactions?startDate=2024-01-01&endDate=2024-04-30",
+              "host": ["{{base_url}}"],
+              "path": ["collectivities", "{{collectivity_id}}", "transactions"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-04-30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "7. GET Comptes Financiers (NEW) - Sans date",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response est un tableau avec comptes', function() {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.expect(jsonData).to.be.an('array');",
+                  "  if(jsonData.length > 0) {",
+                  "    pm.expect(jsonData[0]).to.have.property('type');",
+                  "    pm.expect(jsonData[0]).to.have.property('balance');",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/collectivities/{{collectivity_id}}/financialAccounts",
+              "host": ["{{base_url}}"],
+              "path": ["collectivities", "{{collectivity_id}}", "financialAccounts"]
+            }
+          }
+        },
+        {
+          "name": "8. GET Comptes Financiers (NEW) - Avec date",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contient balances pour la date donnée', function() {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/collectivities/{{collectivity_id}}/financialAccounts?at=2024-04-15",
+              "host": ["{{base_url}}"],
+              "path": ["collectivities", "{{collectivity_id}}", "financialAccounts"],
+              "query": [
+                {
+                  "key": "at",
+                  "value": "2024-04-15"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Membres",
+      "item": [
+        {
+          "name": "1. POST Créer membres",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function() {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response contient IDs des membres créés', function() {",
+                  "  var jsonData = pm.response.json();",
+                  "  if(Array.isArray(jsonData) && jsonData.length > 0) {",
+                  "    pm.collectionVariables.set('member_id', jsonData[0].id);",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"firstName\": \"Jean\",\n    \"lastName\": \"Dupont\",\n    \"dateOfBirth\": \"1980-05-15\",\n    \"gender\": \"MALE\",\n    \"occupation\": \"AGRICULTURE\",\n    \"phoneNumber\": \"+223 75 12 34 56\",\n    \"email\": \"jean.dupont@example.com\",\n    \"collectivityId\": \"{{collectivity_id}}\"\n  },\n  {\n    \"firstName\": \"Marie\",\n    \"lastName\": \"Martin\",\n    \"dateOfBirth\": \"1985-03-20\",\n    \"gender\": \"FEMALE\",\n    \"occupation\": \"COMMERCE\",\n    \"phoneNumber\": \"+223 76 98 76 54\",\n    \"email\": \"marie.martin@example.com\",\n    \"collectivityId\": \"{{collectivity_id}}\"\n  },\n  {\n    \"firstName\": \"Ahmed\",\n    \"lastName\": \"Ba\",\n    \"dateOfBirth\": \"1990-07-10\",\n    \"gender\": \"MALE\",\n    \"occupation\": \"FISHING\",\n    \"phoneNumber\": \"+223 77 55 33 22\",\n    \"email\": \"ahmed.ba@example.com\",\n    \"collectivityId\": \"{{collectivity_id}}\"\n  }\n]"
+            },
+            "url": {
+              "raw": "{{base_url}}/members",
+              "host": ["{{base_url}}"],
+              "path": ["members"]
+            }
+          }
+        },
+        {
+          "name": "2. POST Enregistrer paiements",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function() {",
+                  "  pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"amount\": 5000,\n    \"paymentDate\": \"2024-04-20\",\n    \"paymentMethod\": \"CASH\",\n    \"reference\": \"PAY-2024-001\",\n    \"description\": \"Cotisation avril 2024\"\n  },\n  {\n    \"amount\": 10000,\n    \"paymentDate\": \"2024-04-21\",\n    \"paymentMethod\": \"MOBILE_MONEY\",\n    \"reference\": \"PAY-2024-002\",\n    \"description\": \"Cotisation spéciale\"\n  }\n]"
+            },
+            "url": {
+              "raw": "{{base_url}}/members/{{member_id}}/payments",
+              "host": ["{{base_url}}"],
+              "path": ["members", "{{member_id}}", "payments"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tests d'Erreur",
+      "item": [
+        {
+          "name": "GET Collectivité inexistante (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function() {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/collectivities/999999",
+              "host": ["{{base_url}}"],
+              "path": ["collectivities", "999999"]
+            }
+          }
+        },
+        {
+          "name": "POST Données invalides (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function() {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/collectivities",
+              "host": ["{{base_url}}"],
+              "path": ["collectivities"]
+            }
+          }
+        },
+        {
+          "name": "GET Comptes avec date invalide",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 ou 200', function() {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 400, 422]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/collectivities/{{collectivity_id}}/financialAccounts?at=invalid-date",
+              "host": ["{{base_url}}"],
+              "path": ["collectivities", "{{collectivity_id}}", "financialAccounts"],
+              "query": [
+                {
+                  "key": "at",
+                  "value": "invalid-date"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080/api",
+      "type": "string"
+    },
+    {
+      "key": "collectivity_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "member_id",
+      "value": "1",
+      "type": "string"
+    }
+  ]
+}

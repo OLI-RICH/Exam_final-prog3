@@ -1,6 +1,7 @@
 package com.exam.project.dto;
 
 import com.exam.project.model.PaymentMethod;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -12,21 +13,51 @@ public class CreateContribution {
     private PaymentMethod paymentMethod;
     private String description;
 
-    public String getMemberId() { return memberId; }
-    public void setMemberId(String memberId) { this.memberId = memberId; }
+    public String getMemberId() {
+        return memberId;
+    }
 
-    public String getCollectivityId() { return collectivityId; }
-    public void setCollectivityId(String collectivityId) { this.collectivityId = collectivityId; }
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
+    }
 
-    public BigDecimal getAmount() { return amount; }
-    public void setAmount(BigDecimal amount) { this.amount = amount; }
+    public String getCollectivityId() {
+        return collectivityId;
+    }
 
-    public LocalDate getDate() { return date; }
-    public void setDate(LocalDate date) { this.date = date; }
+    public void setCollectivityId(String collectivityId) {
+        this.collectivityId = collectivityId;
+    }
 
-    public PaymentMethod getPaymentMethod() { return paymentMethod; }
-    public void setPaymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; }
+    public BigDecimal getAmount() {
+        return amount;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }
