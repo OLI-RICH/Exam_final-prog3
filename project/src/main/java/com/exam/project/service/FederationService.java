@@ -17,8 +17,6 @@ public class FederationService {
         this.dataSource = dataSource;
     }
 
-    // ==================== COLLECTIVITES ====================
-
     public void createCollectivity(Collectivity col) throws SQLException {
         String sql = "INSERT INTO collectivity (id, name, city, creation_date) VALUES (?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
@@ -62,8 +60,6 @@ public class FederationService {
             if (ps.executeUpdate() == 0) throw new IllegalStateException("Identité déjà fixée.");
         }
     }
-
-    // ==================== MEMBRES ====================
 
     public void addMember(Member m) throws SQLException {
         String sql = "INSERT INTO member (id, first_name, last_name, collectivity_id, joining_date, occupation) VALUES (?,?,?,?,?,?)";
@@ -122,8 +118,6 @@ public class FederationService {
         return members;
     }
 
-    // ==================== COMPTES ====================
-
     public void createAccount(Account account) throws SQLException {
         String sql = "INSERT INTO account (id, type, owner_id, balance, holder_name) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
@@ -179,10 +173,8 @@ public class FederationService {
     public List<Account> getAccountsWithBalance(String collectivityId, LocalDate at) throws SQLException {
         List<Account> accounts = new ArrayList<>();
 
-        // 1. Calculer le total des contributions pour cette collectivité à la date donnée
         BigDecimal totalContributions = getTotalContributions(collectivityId, at);
 
-        // 2. Récupérer tous les comptes de la collectivité
         String sqlAcc = "SELECT id, type, owner_id, balance, holder_name FROM account WHERE owner_id = ?";
 
         try (Connection conn = dataSource.getConnection();
@@ -218,8 +210,6 @@ public class FederationService {
         }
         return BigDecimal.ZERO;
     }
-
-    // ==================== CONTRIBUTIONS ====================
 
     public void recordContribution(Contribution c) throws SQLException {
         String sql = "INSERT INTO contribution (id, member_id, collectivity_id, amount, date, payment_method, description) VALUES (?,?,?,?,?,?,?)";
