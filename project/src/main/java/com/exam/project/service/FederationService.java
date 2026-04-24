@@ -17,6 +17,8 @@ public class FederationService {
         this.dataSource = dataSource;
     }
 
+    // ==================== COLLECTIVITES ====================
+
     public void createCollectivity(Collectivity col) throws SQLException {
         String sql = "INSERT INTO collectivity (id, name, city, creation_date) VALUES (?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
@@ -29,14 +31,14 @@ public class FederationService {
         }
     }
 
-    public com.exam.project.model.Collectivity getCollectivityById(String id) throws SQLException {
+    public Collectivity getCollectivityById(String id) throws SQLException {
         String sql = "SELECT id, name, city, creation_date, identification_number, unique_name FROM collectivity WHERE id = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                com.exam.project.model.Collectivity col = new com.exam.project.model.Collectivity();
+                Collectivity col = new Collectivity();
                 col.setId(rs.getString("id"));
                 col.setName(rs.getString("name"));
                 col.setCity(rs.getString("city"));
@@ -61,7 +63,9 @@ public class FederationService {
         }
     }
 
-    public void addMember(com.exam.project.model.Member m) throws SQLException {
+    // ==================== MEMBRES ====================
+
+    public void addMember(Member m) throws SQLException {
         String sql = "INSERT INTO member (id, first_name, last_name, collectivity_id, joining_date, occupation) VALUES (?,?,?,?,?,?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -75,14 +79,14 @@ public class FederationService {
         }
     }
 
-    public com.exam.project.model.Member getMemberById(String id) throws SQLException {
+    public Member getMemberById(String id) throws SQLException {
         String sql = "SELECT id, first_name, last_name, collectivity_id, joining_date, occupation FROM member WHERE id = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                com.exam.project.model.Member m = new com.exam.project.model.Member();
+                Member m = new Member();
                 m.setId(rs.getString("id"));
                 m.setFirstName(rs.getString("first_name"));
                 m.setLastName(rs.getString("last_name"));
@@ -96,15 +100,15 @@ public class FederationService {
         return null;
     }
 
-    public List<com.exam.project.model.Member> getMembersByCollectivityId(String collectivityId) throws SQLException {
-        List<com.exam.project.model.Member> members = new ArrayList<>();
+    public List<Member> getMembersByCollectivityId(String collectivityId) throws SQLException {
+        List<Member> members = new ArrayList<>();
         String sql = "SELECT id, first_name, last_name, collectivity_id, joining_date, occupation FROM member WHERE collectivity_id = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, collectivityId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                com.exam.project.model.Member m = new com.exam.project.model.Member();
+                Member m = new Member();
                 m.setId(rs.getString("id"));
                 m.setFirstName(rs.getString("first_name"));
                 m.setLastName(rs.getString("last_name"));
@@ -117,6 +121,8 @@ public class FederationService {
         }
         return members;
     }
+
+    // ==================== COMPTES ====================
 
     public void createAccount(Account account) throws SQLException {
         String sql = "INSERT INTO account (id, type, owner_id, balance, holder_name) VALUES (?, ?, ?, ?, ?)";
@@ -170,34 +176,50 @@ public class FederationService {
         return accounts;
     }
 
-    public List<Account> getAccountsWithBalance(String ownerId, LocalDate at) throws SQLException {
+    public List<Account> getAccountsWithBalance(String collectivityId, LocalDate at) throws SQLException {
         List<Account> accounts = new ArrayList<>();
-        String sqlSum = "SELECT COALESCE(SUM(amount), 0) FROM contribution WHERE collectivity_id = ? AND date <= ?";
-        String sqlAcc = "SELECT * FROM account WHERE owner_id = ?";
 
-        try (Connection conn = dataSource.getConnection()) {
-            BigDecimal currentBalance = BigDecimal.ZERO;
-            try (PreparedStatement psSum = conn.prepareStatement(sqlSum)) {
-                psSum.setString(1, ownerId);
-                psSum.setDate(2, Date.valueOf(at));
-                ResultSet rs = psSum.executeQuery();
-                if (rs.next()) currentBalance = rs.getBigDecimal(1);
-            }
-            try (PreparedStatement psAcc = conn.prepareStatement(sqlAcc)) {
-                psAcc.setString(1, ownerId);
-                ResultSet rs = psAcc.executeQuery();
-                while (rs.next()) {
-                    accounts.add(Account.builder()
-                            .id(rs.getString("id"))
-                            .type(rs.getString("type"))
-                            .balance(currentBalance)
-                            .holderName(rs.getString("holder_name"))
-                            .build());
-                }
+        // 1. Calculer le total des contributions pour cette collectivité à la date donnée
+        BigDecimal totalContributions = getTotalContributions(collectivityId, at);
+
+        // 2. Récupérer tous les comptes de la collectivité
+        String sqlAcc = "SELECT id, type, owner_id, balance, holder_name FROM account WHERE owner_id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement psAcc = conn.prepareStatement(sqlAcc)) {
+
+            psAcc.setString(1, collectivityId);
+            ResultSet rs = psAcc.executeQuery();
+
+            while (rs.next()) {
+                Account account = new Account();
+                account.setId(rs.getString("id"));
+                account.setType(rs.getString("type"));
+                account.setOwnerId(rs.getString("owner_id"));
+                account.setBalance(totalContributions);  // Le solde est le total des contributions
+                account.setHolderName(rs.getString("holder_name"));
+                accounts.add(account);
             }
         }
         return accounts;
     }
+
+    private BigDecimal getTotalContributions(String collectivityId, LocalDate at) throws SQLException {
+        String sqlSum = "SELECT COALESCE(SUM(amount), 0) FROM contribution WHERE collectivity_id = ? AND date <= ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement psSum = conn.prepareStatement(sqlSum)) {
+            psSum.setString(1, collectivityId);
+            psSum.setDate(2, Date.valueOf(at));
+            ResultSet rsSum = psSum.executeQuery();
+            if (rsSum.next()) {
+                return rsSum.getBigDecimal(1);
+            }
+        }
+        return BigDecimal.ZERO;
+    }
+
+    // ==================== CONTRIBUTIONS ====================
 
     public void recordContribution(Contribution c) throws SQLException {
         String sql = "INSERT INTO contribution (id, member_id, collectivity_id, amount, date, payment_method, description) VALUES (?,?,?,?,?,?,?)";
@@ -238,11 +260,13 @@ public class FederationService {
     public List<Contribution> getTransactionsByCollectivityId(String collectivityId, LocalDate start, LocalDate end) throws SQLException {
         List<Contribution> transactions = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT * FROM contribution WHERE collectivity_id = ? AND member_id IS NOT NULL AND member_id != ''");
+
         if (start != null) sql.append(" AND date >= ?");
         if (end != null) sql.append(" AND date <= ?");
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
             int index = 1;
             ps.setString(index++, collectivityId);
             if (start != null) ps.setDate(index++, Date.valueOf(start));
