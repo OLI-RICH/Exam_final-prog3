@@ -69,7 +69,7 @@ INSERT INTO contribution (id, member_id, collectivity_id, amount, date, payment_
 ('P2-7', 'C2-M7', 'col-2', 40000, '2026-01-01', 'MOBILE_MONEY', 'Paiement partiel'),
 ('P2-8', 'C2-M8', 'col-2', 60000, '2026-01-01', 'MOBILE_MONEY', 'Paiement partiel');
 
-INSERT INTO payment (id, member_id, collectivity_id, amount, account_id, payment_method, payment_date) VALUES
+INSERT INTO contribution (id, member_id, collectivity_id, amount, account_id, payment_method, payment_date) VALUES
 ('PAY-C1-001', 'C1-M1', 'col-1', 100000, 'C1-A-CASH', 'CASH', '2026-01-01'),
 ('PAY-C1-002', 'C1-M2', 'col-1', 100000, 'C1-A-CASH', 'CASH', '2026-01-01'),
 ('PAY-C1-003', 'C1-M3', 'col-1', 100000, 'C1-A-CASH', 'CASH', '2026-01-01'),
@@ -79,7 +79,7 @@ INSERT INTO payment (id, member_id, collectivity_id, amount, account_id, payment
 ('PAY-C1-007', 'C1-M7', 'col-1', 60000,  'C1-A-CASH', 'CASH', '2026-01-01'),
 ('PAY-C1-008', 'C1-M8', 'col-1', 90000,  'C1-A-CASH', 'CASH', '2026-01-01');
 
-INSERT INTO transaction (id, member_id, collectivity_id, amount, account_id, payment_method, creation_date) VALUES
+INSERT INTO contribution (id, member_id, collectivity_id, amount, account_id, payment_method, creation_date) VALUES
 ('TR-C1-001', 'C1-M1', 'col-1', 100000, 'C1-A-CASH', 'CASH', '2026-01-01'),
 ('TR-C1-002', 'C1-M2', 'col-1', 100000, 'C1-A-CASH', 'CASH', '2026-01-01'),
 ('TR-C1-003', 'C1-M3', 'col-1', 100000, 'C1-A-CASH', 'CASH', '2026-01-01'),
@@ -89,7 +89,7 @@ INSERT INTO transaction (id, member_id, collectivity_id, amount, account_id, pay
 ('TR-C1-007', 'C1-M7', 'col-1', 60000,  'C1-A-CASH', 'CASH', '2026-01-01'),
 ('TR-C1-008', 'C1-M8', 'col-1', 90000,  'C1-A-CASH', 'CASH', '2026-01-01');
 
-INSERT INTO payment (id, member_id, collectivity_id, amount, account_id, payment_method, payment_date) VALUES
+INSERT INTO contribution (id, member_id, collectivity_id, amount, account_id, payment_method, payment_date) VALUES
 ('PAY-C2-001', 'C2-M1', 'col-2', 60000,  'C2-A-CASH', 'CASH', '2026-01-01'),
 ('PAY-C2-002', 'C2-M2', 'col-2', 90000,  'C2-A-CASH', 'CASH', '2026-01-01'),
 ('PAY-C2-003', 'C2-M3', 'col-2', 100000, 'C2-A-CASH', 'CASH', '2026-01-01'),
@@ -99,7 +99,7 @@ INSERT INTO payment (id, member_id, collectivity_id, amount, account_id, payment
 ('PAY-C2-007', 'C2-M7', 'col-2', 40000,  'C2-A-MOBILE-1', 'MOBILE_MONEY', '2026-01-01'),
 ('PAY-C2-008', 'C2-M8', 'col-2', 60000,  'C2-A-MOBILE-1', 'MOBILE_MONEY', '2026-01-01');
 
-INSERT INTO transaction (id, member_id, collectivity_id, amount, account_id, payment_method, creation_date) VALUES
+INSERT INTO contribution (id, member_id, collectivity_id, amount, account_id, payment_method, creation_date) VALUES
 ('TR-C2-001', 'C2-M1', 'col-2', 60000,  'C2-A-CASH', 'CASH', '2026-01-01'),
 ('TR-C2-002', 'C2-M2', 'col-2', 90000,  'C2-A-CASH', 'CASH', '2026-01-01'),
 ('TR-C2-003', 'C2-M3', 'col-2', 100000, 'C2-A-CASH', 'CASH', '2026-01-01'),
