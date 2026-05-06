@@ -9,6 +9,7 @@ import com.exam.project.service.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -22,11 +23,14 @@ public class CollectivityController {
     private final ContributionService contributionService;
     private final ActivityService activityService;
 
-    public CollectivityController(CollectivityService collectivityService, MemberService memberService, FinancialService financialService, ContributionService contributionService) {
+    public CollectivityController(CollectivityService collectivityService, MemberService memberService,
+                                  FinancialService financialService, ContributionService contributionService,
+                                  ActivityService activityService) {
         this.collectivityService = collectivityService;
         this.memberService = memberService;
         this.financialService = financialService;
         this.contributionService = contributionService;
+        this.activityService = activityService;
     }
 
     @PostMapping
@@ -144,7 +148,7 @@ public class CollectivityController {
     public ResponseEntity<?> addActivities(@PathVariable String id, @RequestBody List<Activity> activities) {
         try {
             activityService.addActivities(id, activities);
-            return ResponseEntity.ok("Activités ajoutées avec succès.");
+            return ResponseEntity.ok("Activities successfully added.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -164,9 +168,9 @@ public class CollectivityController {
     public ResponseEntity<?> recordAttendance(@PathVariable String id, @PathVariable String activityId, @RequestBody List<AttendanceRecord> records) {
         try {
             activityService.recordAttendance(activityId, records);
-            return ResponseEntity.ok("Présences enregistrées avec succès.");
+            return ResponseEntity.ok("Attendance successfully recorded.");
         } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage()); // Intercepte la tentative de fraude (400)
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
