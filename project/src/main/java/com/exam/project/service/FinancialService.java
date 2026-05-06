@@ -3,23 +3,29 @@ package com.exam.project.service;
 import com.exam.project.dto.MemberStatisticDTO;
 import com.exam.project.dto.CollectivityStatisticDTO;
 import com.exam.project.model.Account;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+
+import javax.sql.DataSource;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class FinancialService {
     private final AccountService accountService;
     private final ContributionService contributionService;
-    private final JdbcTemplate jdbcTemplate;
+    private final DataSource dataSource;
 
-    public FinancialService(AccountService accountService, ContributionService contributionService, JdbcTemplate jdbcTemplate) {
+    public FinancialService(AccountService accountService, ContributionService contributionService, DataSource dataSource) {
         this.accountService = accountService;
         this.contributionService = contributionService;
-        this.jdbcTemplate = jdbcTemplate;
+        this.dataSource = dataSource;
     }
 
     public List<Account> getAccountsWithBalance(String collectivityId, LocalDate at) throws SQLException {
@@ -32,12 +38,13 @@ public class FinancialService {
     }
 
     public List<MemberStatisticDTO> getMemberStatistics(String collectivityId, LocalDate start, LocalDate end) {
+        List<MemberStatisticDTO> stats = new ArrayList<>();
         String sql =
                 "SELECT m.id, m.first_name, m.last_name, " +
                         "       COALESCE(SUM(CASE WHEN c.date BETWEEN ? AND ? THEN c.amount ELSE 0 END), 0) as total_paid, " +
                         "       COALESCE(" +
                         "           (SELECT SUM(req.amount) FROM contribution req " +
-                        "            WHERE req.collectivity_id = ? AND req.status = 'ACTIVE' AND req.member_id IS NULL) " + // Cotisation de référence active
+                        "            WHERE req.collectivity_id = ? AND req.status = 'ACTIVE' AND req.member_id IS NULL) " +
                         "           - COALESCE(SUM(c.amount), 0), 0" +
                         "       ) as potential_unpaid " +
                         "FROM member m " +
@@ -45,21 +52,41 @@ public class FinancialService {
                         "WHERE m.collectivity_id = ? " +
                         "GROUP BY m.id, m.first_name, m.last_name";
 
-        return jdbcTemplate.query(sql, (rs, rowNum) -> new MemberStatisticDTO(
-                rs.getString("id"),
-                rs.getString("first_name"),
-                rs.getString("last_name"),
-                rs.getBigDecimal("total_paid"),
-                rs.getBigDecimal("potential_unpaid")
-        ), start, end, collectivityId, collectivityId, collectivityId);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setDate(1, Date.valueOf(start));
+            ps.setDate(2, Date.valueOf(end));
+            ps.setString(3, collectivityId);
+            ps.setString(4, collectivityId);
+            ps.setString(5, collectivityId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    BigDecimal totalPaid = rs.getBigDecimal("total_paid");
+                    BigDecimal potentialUnpaid = rs.getBigDecimal("potential_unpaid");
+
+                    stats.add(new MemberStatisticDTO(
+                            rs.getString("id"),
+                            rs.getString("first_name"),
+                            rs.getString("last_name"),
+                            totalPaid != null ? totalPaid : BigDecimal.ZERO,
+                            potentialUnpaid != null ? potentialUnpaid : BigDecimal.ZERO
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving member statistics : " + e.getMessage(), e);
+        }
+        return stats;
     }
 
     public List<CollectivityStatisticDTO> getGlobalStatistics(LocalDate start, LocalDate end) {
+        List<CollectivityStatisticDTO> stats = new ArrayList<>();
+
         String sql =
                 "SELECT col.id, col.name, " +
-                        "       -- Nombre de nouveaux adhérents inscrits sur la période " +
                         "       (SELECT COUNT(*) FROM member m WHERE m.collectivity_id = col.id AND m.joining_date BETWEEN ? AND ?) as new_members, " +
-                        "       -- Pourcentage de membres à jour (sur les cotisations actives uniquement) " +
                         "       (SELECT " +
                         "           CASE WHEN COUNT(m2.id) = 0 THEN 0.0 " +
                         "           ELSE (SUM(CASE WHEN " +
@@ -70,11 +97,28 @@ public class FinancialService {
                         "        FROM member m2 WHERE m2.collectivity_id = col.id) as uptodate_pct " +
                         "FROM collectivity col";
 
-        return jdbcTemplate.query(sql, (rs, rowNum) -> new CollectivityStatisticDTO(
-                rs.getString("id"),
-                rs.getString("name"),
-                rs.getDouble("uptodate_pct"),
-                rs.getLong("new_members")
-        ), start, end);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setDate(1, Date.valueOf(start));
+            ps.setDate(2, Date.valueOf(end));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    BigDecimal pctVal = rs.getBigDecimal("uptodate_pct");
+                    double percentage = pctVal != null ? pctVal.doubleValue() : 0.0;
+
+                    stats.add(new CollectivityStatisticDTO(
+                            rs.getString("id"),
+                            rs.getString("name"),
+                            percentage,
+                            rs.getLong("new_members")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving global statistics : " + e.getMessage(), e);
+        }
+        return stats;
     }
 }
