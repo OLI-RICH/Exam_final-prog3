@@ -1,5 +1,7 @@
 package com.exam.project.controller;
 
+import com.exam.project.dto.CollectivityStatisticDTO;
+import com.exam.project.dto.MemberStatisticDTO;
 import com.exam.project.model.Account;
 import com.exam.project.model.Collectivity;
 import com.exam.project.model.Contribution;
@@ -111,6 +113,31 @@ public class CollectivityController {
             return ResponseEntity.ok("Identity successfully assigned");
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/statistics")
+    public ResponseEntity<?> getCollectivityStatistics(
+            @PathVariable String id,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+        try {
+            List<MemberStatisticDTO> stats = financialService.getMemberStatistics(id, start, end);
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<?> getGlobalStatistics(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+        try {
+            List<CollectivityStatisticDTO> stats = financialService.getGlobalStatistics(start, end);
+            return ResponseEntity.ok(stats);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
