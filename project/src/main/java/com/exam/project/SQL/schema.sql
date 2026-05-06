@@ -54,3 +54,21 @@ CREATE TABLE contribution (
     payment_method VARCHAR(20) CHECK (payment_method IN ('CASH', 'BANK_TRANSFER', 'MOBILE_MONEY')),
     description TEXT
 );
+
+CREATE TABLE activity (
+    id VARCHAR(50) PRIMARY KEY,
+    collectivity_id VARCHAR(50) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    date DATE NOT NULL,
+    CONSTRAINT fk_activity_collectivity FOREIGN KEY (collectivity_id) REFERENCES collectivity(id) ON DELETE CASCADE
+);
+
+CREATE TABLE attendance (
+    activity_id VARCHAR(50) NOT NULL,
+    member_id VARCHAR(50) NOT NULL,
+    status VARCHAR(20) NOT NULL, -- 'PRESENT' ou 'ABSENT'
+    PRIMARY KEY (activity_id, member_id),
+    CONSTRAINT fk_attendance_activity FOREIGN KEY (activity_id) REFERENCES activity(id) ON DELETE CASCADE,
+    CONSTRAINT fk_attendance_member FOREIGN KEY (member_id) REFERENCES member(id) ON DELETE CASCADE
+);
