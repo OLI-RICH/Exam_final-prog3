@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/collectivities")
+@RequestMapping("/api")
 public class CollectivityController {
     private final CollectivityService collectivityService;
     private final MemberService memberService;
@@ -33,7 +33,7 @@ public class CollectivityController {
         this.activityService = activityService;
     }
 
-    @PostMapping
+    @PostMapping("/collectivities")
     public ResponseEntity<?> createCollectivity(@RequestBody Collectivity col) {
         try {
             col.setId("COL-" + UUID.randomUUID().toString().substring(0, 5));
@@ -45,7 +45,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/collectivities")
     public ResponseEntity<?> getAllCollectivities() {
         try {
             List<Collectivity> collectivities = collectivityService.getAllCollectivities();
@@ -55,7 +55,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/collectivities/{id}")
     public ResponseEntity<?> getCollectivity(@PathVariable String id) {
         try {
             Collectivity collectivity = collectivityService.getCollectivityById(id);
@@ -66,7 +66,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/{id}/members")
+    @GetMapping("/collectivities/{id}/members")
     public ResponseEntity<?> getCollectivityMembers(@PathVariable String id) {
         try {
             List<Member> members = memberService.getMembersByCollectivityId(id);
@@ -76,8 +76,10 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/{id}/financialAccounts")
-    public ResponseEntity<?> getFinancialAccounts(@PathVariable String id, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate at) {
+    @GetMapping("/collectivities/{id}/financialAccounts")
+    public ResponseEntity<?> getFinancialAccounts(
+            @PathVariable String id,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate at) {
         try {
             LocalDate dateQuery = (at != null) ? at : LocalDate.now();
             List<Account> accounts = financialService.getAccountsWithBalance(id, dateQuery);
@@ -87,7 +89,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/{id}/membershipFees")
+    @GetMapping("/collectivities/{id}/membershipFees")
     public ResponseEntity<?> getMembershipFees(@PathVariable String id) {
         try {
             List<Contribution> fees = contributionService.getMembershipFeesByCollectivityId(id);
@@ -97,8 +99,11 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/{id}/transactions")
-    public ResponseEntity<?> getTransactions(@PathVariable String id, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+    @GetMapping("/collectivities/{id}/transactions")
+    public ResponseEntity<?> getTransactions(
+            @PathVariable String id,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
         try {
             List<Contribution> transactions = contributionService.getTransactionsByCollectivityId(id, start, end);
             return ResponseEntity.ok(transactions);
@@ -107,7 +112,7 @@ public class CollectivityController {
         }
     }
 
-    @PutMapping("/{id}/informations")
+    @PutMapping("/collectivities/{id}/informations")
     public ResponseEntity<?> assignIdentity(@PathVariable String id, @RequestParam String number, @RequestParam String name) {
         try {
             collectivityService.assignIdentity(id, number, name);
@@ -119,7 +124,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/{id}/statistics")
+    @GetMapping("/collectivites/{id}/statistics")
     public ResponseEntity<?> getCollectivityStatistics(
             @PathVariable String id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
@@ -132,7 +137,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/statistics")
+    @GetMapping("/collectivities/statistics")
     public ResponseEntity<?> getGlobalStatistics(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
@@ -144,7 +149,7 @@ public class CollectivityController {
         }
     }
 
-    @PostMapping("/{id}/activities")
+    @PostMapping("/collectivities/{id}/activities")
     public ResponseEntity<?> addActivities(@PathVariable String id, @RequestBody List<Activity> activities) {
         try {
             activityService.addActivities(id, activities);
@@ -154,7 +159,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/{id}/activities")
+    @GetMapping("/collectivities/{id}/activities")
     public ResponseEntity<?> getActivities(@PathVariable String id) {
         try {
             List<Activity> activities = activityService.getActivities(id);
@@ -164,8 +169,11 @@ public class CollectivityController {
         }
     }
 
-    @PostMapping("/{id}/activities/{activityId}/attendance")
-    public ResponseEntity<?> recordAttendance(@PathVariable String id, @PathVariable String activityId, @RequestBody List<AttendanceRecord> records) {
+    @PostMapping("/collectivities/{id}/activities/{activityId}/attendance")
+    public ResponseEntity<?> recordAttendance(
+            @PathVariable String id,
+            @PathVariable String activityId,
+            @RequestBody List<AttendanceRecord> records) {
         try {
             activityService.recordAttendance(activityId, records);
             return ResponseEntity.ok("Attendance successfully recorded.");
@@ -176,7 +184,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/{id}/activities/{activityId}/attendance")
+    @GetMapping("/collectivities/{id}/activities/{activityId}/attendance")
     public ResponseEntity<?> getAttendance(@PathVariable String id, @PathVariable String activityId) {
         try {
             List<AttendeeDTO> attendees = activityService.getAttendance(activityId);
