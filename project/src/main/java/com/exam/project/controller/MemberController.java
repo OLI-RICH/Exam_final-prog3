@@ -23,7 +23,7 @@ public class MemberController {
             m.setId("MEM-" + UUID.randomUUID().toString().substring(0, 5));
             m.setJoinDate(LocalDate.now());
             memberService.addMember(m);
-            return ResponseEntity.ok("Membre ajouté");
+            return ResponseEntity.ok("Member added");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -46,7 +46,7 @@ public class MemberController {
             payment.setId("PAY-" + UUID.randomUUID().toString().substring(0, 8));
             if (payment.getDate() == null) payment.setDate(LocalDate.now());
             memberService.recordPayment(id, payment);
-            return ResponseEntity.ok("Paiement enregistré avec succès");
+            return ResponseEntity.ok("Payment registered successfully");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

@@ -108,7 +108,7 @@ public class CollectivityController {
     public ResponseEntity<?> assignIdentity(@PathVariable String id, @RequestParam String number, @RequestParam String name) {
         try {
             collectivityService.assignIdentity(id, number, name);
-            return ResponseEntity.ok("Identité assignée avec succès");
+            return ResponseEntity.ok("Identity successfully assigned");
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {

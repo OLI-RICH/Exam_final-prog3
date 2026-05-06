@@ -82,7 +82,7 @@ public class CollectivityService {
             ps.setString(1, number);
             ps.setString(2, name);
             ps.setString(3, id);
-            if (ps.executeUpdate() == 0) throw new IllegalStateException("Identité déjà fixée.");
+            if (ps.executeUpdate() == 0) throw new IllegalStateException("Identity already established.");
         }
     }
 }
