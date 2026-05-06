@@ -1,15 +1,11 @@
 package com.exam.project.controller;
 
+import com.exam.project.dto.AttendanceRecord;
+import com.exam.project.dto.AttendeeDTO;
 import com.exam.project.dto.CollectivityStatisticDTO;
 import com.exam.project.dto.MemberStatisticDTO;
-import com.exam.project.model.Account;
-import com.exam.project.model.Collectivity;
-import com.exam.project.model.Contribution;
-import com.exam.project.model.Member;
-import com.exam.project.service.CollectivityService;
-import com.exam.project.service.MemberService;
-import com.exam.project.service.FinancialService;
-import com.exam.project.service.ContributionService;
+import com.exam.project.model.*;
+import com.exam.project.service.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +20,7 @@ public class CollectivityController {
     private final MemberService memberService;
     private final FinancialService financialService;
     private final ContributionService contributionService;
+    private final ActivityService activityService;
 
     public CollectivityController(CollectivityService collectivityService, MemberService memberService, FinancialService financialService, ContributionService contributionService) {
         this.collectivityService = collectivityService;
@@ -138,6 +135,48 @@ public class CollectivityController {
         try {
             List<CollectivityStatisticDTO> stats = financialService.getGlobalStatistics(start, end);
             return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/activities")
+    public ResponseEntity<?> addActivities(@PathVariable String id, @RequestBody List<Activity> activities) {
+        try {
+            activityService.addActivities(id, activities);
+            return ResponseEntity.ok("Activités ajoutées avec succès.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/activities")
+    public ResponseEntity<?> getActivities(@PathVariable String id) {
+        try {
+            List<Activity> activities = activityService.getActivities(id);
+            return ResponseEntity.ok(activities);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/activities/{activityId}/attendance")
+    public ResponseEntity<?> recordAttendance(@PathVariable String id, @PathVariable String activityId, @RequestBody List<AttendanceRecord> records) {
+        try {
+            activityService.recordAttendance(activityId, records);
+            return ResponseEntity.ok("Présences enregistrées avec succès.");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage()); // Intercepte la tentative de fraude (400)
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/activities/{activityId}/attendance")
+    public ResponseEntity<?> getAttendance(@PathVariable String id, @PathVariable String activityId) {
+        try {
+            List<AttendeeDTO> attendees = activityService.getAttendance(activityId);
+            return ResponseEntity.ok(attendees);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
