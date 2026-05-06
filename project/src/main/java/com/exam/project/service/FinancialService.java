@@ -47,7 +47,6 @@ public class FinancialService {
                         "            WHERE req.collectivity_id = ? AND req.status = 'ACTIVE' AND req.member_id IS NULL) " +
                         "           - COALESCE(SUM(c.amount), 0), 0" +
                         "       ) as potential_unpaid, " +
-                        "       -- Calculation of individual attendance rate over the period" +
                         "       COALESCE(" +
                         "           (SELECT (COUNT(CASE WHEN att.status = 'PRESENT' THEN 1 END) * 100.0) / NULLIF(COUNT(*), 0) " +
                         "            FROM attendance att " +
@@ -97,7 +96,6 @@ public class FinancialService {
         String sql =
                 "SELECT col.id, col.name, " +
                         "       (SELECT COUNT(*) FROM member m WHERE m.collectivity_id = col.id AND m.joining_date BETWEEN ? AND ?) as new_members, " +
-                        "       -- Percentage of members with up-to-date dues (active memberships only))" +
                         "       (SELECT " +
                         "           CASE WHEN COUNT(m2.id) = 0 THEN 0.0 " +
                         "           ELSE (SUM(CASE WHEN " +
@@ -106,7 +104,6 @@ public class FinancialService {
                         "               THEN 1 ELSE 0 END) * 100.0) / COUNT(m2.id) " +
                         "           END " +
                         "        FROM member m2 WHERE m2.collectivity_id = col.id) as uptodate_pct, " +
-                        "       -- Overall attendance rate of community members over the period" +
                         "       COALESCE(" +
                         "           (SELECT (COUNT(CASE WHEN att.status = 'PRESENT' THEN 1 END) * 100.0) / NULLIF(COUNT(*), 0) " +
                         "            FROM attendance att " +
