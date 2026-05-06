@@ -94,4 +94,27 @@ public class ContributionService {
         }
         return BigDecimal.ZERO;
     }
+
+    public List<Contribution> saveAllMembershipFees(String collectivityId, List<Contribution> fees) throws SQLException {
+        String sql = "INSERT INTO contribution (id, amount, date, collectivity_id) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            conn.setAutoCommit(false);
+
+            for (Contribution fee : fees) {
+                ps.setString(1, fee.getId());
+                ps.setBigDecimal(2, fee.getAmount());
+                ps.setDate(3, Date.valueOf(fee.getDate()));
+                ps.setString(4, collectivityId);
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+            conn.commit();
+        }
+
+        return fees;
+    }
 }

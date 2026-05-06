@@ -17,7 +17,8 @@ public class MemberService {
     }
 
     public void addMember(Member m) throws SQLException {
-        String sql = "INSERT INTO member (id, first_name, last_name, collectivity_id, joining_date, occupation) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO member (id, first_name, last_name, collectivity_id, join_date, status) VALUES (?, ?, ?, ?, ?, ?)";
+
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, m.getId());
@@ -25,7 +26,7 @@ public class MemberService {
             ps.setString(3, m.getLastName());
             ps.setString(4, m.getCollectivityId());
             ps.setDate(5, Date.valueOf(m.getJoinDate()));
-            ps.setString(6, m.getStatus());
+            ps.setString(6, m.getStatus() != null ? m.getStatus() : "ACTIVE");
             ps.executeUpdate();
         }
     }

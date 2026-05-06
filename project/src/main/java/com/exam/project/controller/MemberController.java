@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/members")
+@RequestMapping("/members")
 public class MemberController {
     private final MemberService memberService;
 
@@ -20,10 +20,16 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<?> addMember(@RequestBody Member m) {
         try {
-            m.setId("MEM-" + UUID.randomUUID().toString().substring(0, 5));
-            m.setJoinDate(LocalDate.now());
+            if (m.getId() == null || m.getId().isEmpty()) {
+                m.setId("MEM-" + UUID.randomUUID().toString().substring(0, 5));
+            }
+            if (m.getJoinDate() == null) {
+                m.setJoinDate(LocalDate.now());
+            }
+
             memberService.addMember(m);
-            return ResponseEntity.ok("Member added");
+
+            return ResponseEntity.ok(m);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -43,10 +49,16 @@ public class MemberController {
     @PostMapping("/{id}/payments")
     public ResponseEntity<?> recordPayment(@PathVariable String id, @RequestBody Contribution payment) {
         try {
-            payment.setId("PAY-" + UUID.randomUUID().toString().substring(0, 8));
-            if (payment.getDate() == null) payment.setDate(LocalDate.now());
+            if (payment.getId() == null || payment.getId().isEmpty()) {
+                payment.setId("PAY-" + UUID.randomUUID().toString().substring(0, 8));
+            }
+            if (payment.getDate() == null) {
+                payment.setDate(LocalDate.now());
+            }
+
             memberService.recordPayment(id, payment);
-            return ResponseEntity.ok("Payment registered successfully");
+
+            return ResponseEntity.ok(payment);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

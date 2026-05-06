@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/collectivities")
 public class CollectivityController {
     private final CollectivityService collectivityService;
     private final MemberService memberService;
@@ -33,19 +33,25 @@ public class CollectivityController {
         this.activityService = activityService;
     }
 
-    @PostMapping("/collectivities")
+    @PostMapping
     public ResponseEntity<?> createCollectivity(@RequestBody Collectivity col) {
         try {
-            col.setId("COL-" + UUID.randomUUID().toString().substring(0, 5));
-            col.setCreationDate(LocalDate.now());
-            collectivityService.createCollectivity(col);
-            return ResponseEntity.ok(col);
-        } catch (Exception e) {
+            if (col.getId() == null || col.getId().isEmpty()) {
+                col.setId("col-" + UUID.randomUUID().toString().substring(0, 5));
+            }
+            if (col.getCreationDate() == null) {
+                col.setCreationDate(LocalDate.now());
+            }
+            Collectivity savedCollectivity = collectivityService.createCollectivity(col);
+            return ResponseEntity.ok(savedCollectivity);
+        } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 
-    @GetMapping("/collectivities")
+    @GetMapping
     public ResponseEntity<?> getAllCollectivities() {
         try {
             List<Collectivity> collectivities = collectivityService.getAllCollectivities();
@@ -55,7 +61,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/collectivities/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getCollectivity(@PathVariable String id) {
         try {
             Collectivity collectivity = collectivityService.getCollectivityById(id);
@@ -66,7 +72,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/collectivities/{id}/members")
+    @GetMapping("/{id}/members")
     public ResponseEntity<?> getCollectivityMembers(@PathVariable String id) {
         try {
             List<Member> members = memberService.getMembersByCollectivityId(id);
@@ -76,7 +82,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/collectivities/{id}/financialAccounts")
+    @GetMapping("/{id}/financialAccounts")
     public ResponseEntity<?> getFinancialAccounts(
             @PathVariable String id,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate at) {
@@ -89,7 +95,25 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/collectivities/{id}/membershipFees")
+    @PostMapping("/{id}/membershipFees")
+    public ResponseEntity<?> createMembershipFees(@PathVariable String id, @RequestBody List<Contribution> fees) {
+        try {
+            for (Contribution fee : fees) {
+                if (fee.getId() == null) {
+                    fee.setId("CON-" + UUID.randomUUID().toString().substring(0, 8));
+                }
+                if (fee.getDate() == null) {
+                    fee.setDate(LocalDate.now());
+                }
+            }
+            List<Contribution> savedFees = contributionService.saveAllMembershipFees(id, fees);
+            return ResponseEntity.ok(savedFees);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/membershipFees")
     public ResponseEntity<?> getMembershipFees(@PathVariable String id) {
         try {
             List<Contribution> fees = contributionService.getMembershipFeesByCollectivityId(id);
@@ -99,7 +123,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/collectivities/{id}/transactions")
+    @GetMapping("/{id}/transactions")
     public ResponseEntity<?> getTransactions(
             @PathVariable String id,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
@@ -112,11 +136,14 @@ public class CollectivityController {
         }
     }
 
-    @PutMapping("/collectivities/{id}/informations")
-    public ResponseEntity<?> assignIdentity(@PathVariable String id, @RequestParam String number, @RequestParam String name) {
+    @PutMapping("/{id}/informations")
+    public ResponseEntity<?> assignIdentity(
+            @PathVariable String id,
+            @RequestParam String number,
+            @RequestParam String name) {
         try {
-            collectivityService.assignIdentity(id, number, name);
-            return ResponseEntity.ok("Identity successfully assigned");
+            Collectivity updatedCollectivity = collectivityService.assignIdentity(id, number, name);
+            return ResponseEntity.ok(updatedCollectivity);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -124,7 +151,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/collectivites/{id}/statistics")
+    @GetMapping("/{id}/statistics")
     public ResponseEntity<?> getCollectivityStatistics(
             @PathVariable String id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
@@ -137,7 +164,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/collectivities/statistics")
+    @GetMapping("/statistics")
     public ResponseEntity<?> getGlobalStatistics(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
@@ -149,7 +176,7 @@ public class CollectivityController {
         }
     }
 
-    @PostMapping("/collectivities/{id}/activities")
+    @PostMapping("/{id}/activities")
     public ResponseEntity<?> addActivities(@PathVariable String id, @RequestBody List<Activity> activities) {
         try {
             activityService.addActivities(id, activities);
@@ -159,7 +186,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/collectivities/{id}/activities")
+    @GetMapping("/{id}/activities")
     public ResponseEntity<?> getActivities(@PathVariable String id) {
         try {
             List<Activity> activities = activityService.getActivities(id);
@@ -169,7 +196,7 @@ public class CollectivityController {
         }
     }
 
-    @PostMapping("/collectivities/{id}/activities/{activityId}/attendance")
+    @PostMapping("/{id}/activities/{activityId}/attendance")
     public ResponseEntity<?> recordAttendance(
             @PathVariable String id,
             @PathVariable String activityId,
@@ -184,7 +211,7 @@ public class CollectivityController {
         }
     }
 
-    @GetMapping("/collectivities/{id}/activities/{activityId}/attendance")
+    @GetMapping("/{id}/activities/{activityId}/attendance")
     public ResponseEntity<?> getAttendance(@PathVariable String id, @PathVariable String activityId) {
         try {
             List<AttendeeDTO> attendees = activityService.getAttendance(activityId);

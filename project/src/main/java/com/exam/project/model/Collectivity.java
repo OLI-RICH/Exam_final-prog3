@@ -7,7 +7,7 @@ import java.util.List;
 public class Collectivity {
     private String id;
     private String name;
-    private String city;
+    private String location;
     private LocalDate creationDate;
     private String identificationNumber;
     private String uniqueName;

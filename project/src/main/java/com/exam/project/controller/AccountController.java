@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/accounts")
+@RequestMapping("/accounts")
 public class AccountController {
     private final AccountService accountService;
 
@@ -20,10 +20,16 @@ public class AccountController {
     @PostMapping
     public ResponseEntity<?> createAccount(@RequestBody Account account) {
         try {
-            account.setId("ACC-" + UUID.randomUUID().toString().substring(0, 8));
-            if (account.getBalance() == null) account.setBalance(BigDecimal.ZERO);
+            if (account.getId() == null || account.getId().isEmpty()) {
+                account.setId("ACC-" + UUID.randomUUID().toString().substring(0, 8));
+            }
+            if (account.getBalance() == null) {
+                account.setBalance(BigDecimal.ZERO);
+            }
+
             accountService.createAccount(account);
-            return ResponseEntity.ok("Account created successfully");
+
+            return ResponseEntity.ok(account);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -49,6 +55,7 @@ public class AccountController {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
     @GetMapping
     public ResponseEntity<?> getAllAccounts() {
         try {

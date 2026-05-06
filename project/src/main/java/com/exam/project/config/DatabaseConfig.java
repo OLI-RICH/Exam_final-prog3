@@ -25,7 +25,7 @@ public class DatabaseConfig {
         } catch (SQLException e) {
             System.err.println(" Database connection failed: " + e.getMessage());
             System.err.println("   URL: " + url);
-            throw new SQLException("Connexion à la base de données échouée", e);
+            throw new SQLException("Database connection failed", e);
         }
     }
 }

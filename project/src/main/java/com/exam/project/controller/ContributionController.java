@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/contributions")
+@RequestMapping("/contributions")
 public class ContributionController {
     private final ContributionService contributionService;
 
@@ -19,10 +19,16 @@ public class ContributionController {
     @PostMapping
     public ResponseEntity<?> createContribution(@RequestBody Contribution request) {
         try {
-            if (request.getId() == null) request.setId("CON-" + UUID.randomUUID().toString().substring(0, 8));
-            if (request.getDate() == null) request.setDate(LocalDate.now());
+            if (request.getId() == null || request.getId().isEmpty()) {
+                request.setId("CON-" + UUID.randomUUID().toString().substring(0, 8));
+            }
+            if (request.getDate() == null) {
+                request.setDate(LocalDate.now());
+            }
+
             contributionService.recordContribution(request);
-            return ResponseEntity.ok("Contribution recorded successfully");
+
+            return ResponseEntity.ok(request);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
