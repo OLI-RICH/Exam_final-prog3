@@ -107,7 +107,7 @@ public class CollectivityController {
         }
     }
 
-    @PutMapping("/{id}/identity")
+    @PutMapping("/{id}/informations")
     public ResponseEntity<?> assignIdentity(@PathVariable String id, @RequestParam String number, @RequestParam String name) {
         try {
             collectivityService.assignIdentity(id, number, name);

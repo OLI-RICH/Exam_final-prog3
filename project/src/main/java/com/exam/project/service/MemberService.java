@@ -5,7 +5,6 @@ import com.exam.project.model.Member;
 import org.springframework.stereotype.Service;
 import javax.sql.DataSource;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 

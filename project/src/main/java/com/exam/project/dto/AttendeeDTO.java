@@ -13,8 +13,19 @@ public class AttendeeDTO {
         this.status = status;
     }
 
-    public String getMemberId() { return memberId; }
-    public String getFirstName() { return firstName; }
-    public String getLastName() { return lastName; }
-    public String getStatus() { return status; }
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getStatus() {
+        return status;
+    }
 }
