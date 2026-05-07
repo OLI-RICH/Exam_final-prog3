@@ -56,7 +56,7 @@ INSERT INTO contribution (id, collectivity_id, amount, date, description, member
 ('cot-5', 'col-3', 25000.00, '2026-04-01', 'Cotisation mensuelle ACTIVE MONTHLY', NULL, NULL);
 
 
--- Paiements Collectivité 1 (8 lignes)
+-- Paiements Collectivité 1
 INSERT INTO contribution (id, member_id, collectivity_id, amount, date, payment_method, description) VALUES
 ('PAY-C1-01', 'C1-M1', 'col-1', 200000.00, '2026-01-01', 'CASH', 'Paiement cotisation'),
 ('PAY-C1-02', 'C1-M2', 'col-1', 200000.00, '2026-01-01', 'CASH', 'Paiement cotisation'),
@@ -67,7 +67,7 @@ INSERT INTO contribution (id, member_id, collectivity_id, amount, date, payment_
 ('PAY-C1-07', 'C1-M7', 'col-1', 60000.00, '2026-05-01', 'CASH', 'Paiement partiel'),
 ('PAY-C1-08', 'C1-M8', 'col-1', 90000.00, '2026-05-01', 'CASH', 'Paiement partiel');
 
--- Paiements Collectivité 2 (8 lignes - Réassociés aux membres C2-M1 à C2-M8)
+-- Paiements Collectivité 2
 INSERT INTO contribution (id, member_id, collectivity_id, amount, date, payment_method, description) VALUES
 ('PAY-C2-01', 'C2-M1', 'col-2', 120000.00, '2026-01-01', 'CASH', 'Paiement partiel'),
 ('PAY-C2-02', 'C2-M2', 'col-2', 180000.00, '2026-01-01', 'CASH', 'Paiement partiel'),
@@ -78,7 +78,7 @@ INSERT INTO contribution (id, member_id, collectivity_id, amount, date, payment_
 ('PAY-C2-07', 'C2-M7', 'col-2', 80000.00, '2026-01-01', 'MOBILE_MONEY', 'Paiement partiel'),
 ('PAY-C2-08', 'C2-M8', 'col-2', 120000.00, '2026-01-01', 'MOBILE_MONEY', 'Paiement partiel');
 
--- Paiements Collectivité 3 (18 lignes)
+-- Paiements Collectivité 3
 INSERT INTO contribution (id, member_id, collectivity_id, amount, date, payment_method, description) VALUES
 ('PAY-C3-01', 'C3-M1', 'col-3', 25000.00, '2026-04-01', 'CASH', 'Mensualité Avril'),
 ('PAY-C3-02', 'C3-M2', 'col-3', 25000.00, '2026-04-01', 'CASH', 'Mensualité Avril'),
